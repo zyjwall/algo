@@ -30,27 +30,33 @@ public class SkipList {
       return null;
     }
   }
-
+// 结合黄铮讲的，基本上懂了
   public void insert(int value) {
     int level = randomLevel();
     Node newNode = new Node();
     newNode.data = value;
-    newNode.maxLevel = level;
-    Node update[] = new Node[level];
+    newNode.maxLevel = level;//一共有多少层
+    Node update[] = new Node[level];//创建level层链表
+//       private Node head = new Node();  //每一层创建一个带头链表
     for (int i = 0; i < level; ++i) {
       update[i] = head;
     }
 
     // record every level largest value which smaller than insert value in update[]
+    //找出每层p.forward[]相当于p.next
     Node p = head;
     for (int i = level - 1; i >= 0; --i) {
       while (p.forwards[i] != null && p.forwards[i].data < value) {
         p = p.forwards[i];
       }
+      //保存每一层中要更新的位置
       update[i] = p;// use update save node in search path
     }
 
     // in search path node next node become new node forwords(next)
+    //    Node newNode = new Node();
+//     newNode.data = value;
+    //在每层中<level的每层都插入都插入最简单的插入方法
     for (int i = 0; i < level; ++i) {
       newNode.forwards[i] = update[i].forwards[i];
       update[i].forwards[i] = newNode;
@@ -69,7 +75,7 @@ public class SkipList {
       }
       update[i] = p;
     }
-
+//  判断该链表中是否存在value
     if (p.forwards[0] != null && p.forwards[0].data == value) {
       for (int i = levelCount - 1; i >= 0; --i) {
         if (update[i].forwards[i] != null && update[i].forwards[i].data == value) {
@@ -77,7 +83,7 @@ public class SkipList {
         }
       }
     }
-
+//最高层一个节点也没有，减掉一层
     while (levelCount>1&&head.forwards[levelCount]==null){
       levelCount--;
     }
@@ -90,6 +96,7 @@ public class SkipList {
   //        50%的概率返回 1
   //        25%的概率返回 2
   //      12.5%的概率返回 3 ...
+  //这个random函数太牛了
   private int randomLevel() {
     int level = 1;
 
@@ -97,7 +104,7 @@ public class SkipList {
       level += 1;
     return level;
   }
-
+//打印所有链表
   public void printAll() {
     Node p = head;
     while (p.forwards[0] != null) {
